@@ -1,10 +1,6 @@
-# Speak Video Chat
 
-Speak is a free multi-room multi-user video chatting website.
 
-## Demo
 
-https://speak-video-chat.herokuapp.com/
 
 ## Developed using
 
@@ -17,9 +13,6 @@ https://speak-video-chat.herokuapp.com/
 
 Make sure you have Node.js installed in your system.
 
-Clone this repo
-
-    git clone https://github.com/dhawal-kamdar/Speak-Video-Chat.git
 
 Install PeerJS globally.
 
