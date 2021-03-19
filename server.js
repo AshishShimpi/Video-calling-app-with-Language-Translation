@@ -3,6 +3,10 @@ const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const { v4: uuidV4 } = require("uuid");
+
+const LanguageTranslatorV3 = require('ibm-watson/language-translator/v3');
+const { IamAuthenticator } = require('ibm-watson/auth');
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
@@ -30,9 +34,7 @@ io.on("connection", (socket) => {
 });
 
 
-const LanguageTranslatorV3 = require('ibm-watson/language-translator/v3');
-const { IamAuthenticator } = require('ibm-watson/auth');
-let translatedText;
+let translatedText="Not have anything to translate";
 
 const languageTranslator = new LanguageTranslatorV3({
   //  Please fill the blanks with your credentials
@@ -48,11 +50,6 @@ const languageTranslator = new LanguageTranslatorV3({
 });
 
 
-
-
-
-console.log(`video call server started at 3000`);
-
 let users={};
 
 let model_lang= {
@@ -63,17 +60,18 @@ let model_lang= {
 io.on('connection' , socket =>{
     
     socket.on('new' , name => {
-        console.log('new-user is' , name,"\n");
+        
         users[socket.id] = name;
+        console.log('new-user is' , name,"\n");
         
         socket.broadcast.emit('lets-start', name );
     });
 
     // Data received from the each client
     socket.on(`send-to-server` , data=>{
-
+        
         //Data in same language from client is printed on colsole
-        console.log("Data of user ",users[socket.id]," is ",data.FT ,"and laguage of client is ",data.language,"\n");
+        console.log("Data of user is ->",data.FT ,"and laguage of client is ",data.language,"\n");
 
         // Passing the data to language translator model to get translated text
         const translateParams = {
@@ -81,7 +79,7 @@ io.on('connection' , socket =>{
             modelId: model_lang[data.language],
           };
 
-          console.log(" The text to be translated is ",translateParams.text , "and language model is ",model_lang[data.language]);
+            console.log("Data of user ",users[socket.id]," is ",data.FT ,"and laguage of client is ",data.language,"\n");
           
           languageTranslator.translate(translateParams)
             .then(translationResult => {
@@ -90,23 +88,17 @@ io.on('connection' , socket =>{
                 console.log(translatedText);
                 // [{"translation":"आप कैसे हैं"}]
                 // Then broadcasted to other users
-                socket.broadcast.emit(`client-receive` , {F:translatedText  , user :users[socket.id] })
+                socket.broadcast.emit(`client-receive` , {F :translatedText , user :users[socket.id] })
             
             })
             .catch(err => {
               console.log('error:', err);
             });
-   
     })
 
 });
 
-
-
-
-
-
-
 const PORT = process.env.PORT || 3000;
 
+console.log(`video call server started at 3000`);
 server.listen(PORT, () => console.log(`Server Started on ${PORT}`));

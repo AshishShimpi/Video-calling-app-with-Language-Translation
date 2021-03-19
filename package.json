@@ -2,7 +2,7 @@
   "name": "speak",
   "version": "1.0.0",
   "description": "Speak is a free video chatting website",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server",
     "dev": "nodemon server"

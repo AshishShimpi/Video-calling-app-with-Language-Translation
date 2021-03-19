@@ -8,6 +8,7 @@
       <meta name="robots" content="index,follow" />
       <link rel="icon" href="/img/icon.svg" />
       <link rel="stylesheet" href="/css/style.css" />
+     
       <link
          href="https://fonts.googleapis.com/css2?family=Pattaya&display=swap"
          rel="stylesheet"
@@ -29,6 +30,8 @@
       ></script>
       <script src="/socket.io/socket.io.js" defer></script>
       <script src="/js/script.js" defer></script>
+      <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+      
 
       <title>Speak</title>
    </head>
@@ -46,7 +49,7 @@
       a:hover {
          color: #33f;
       }
-      .button {
+      .button{
          background: -webkit-linear-gradient(top, #008dfd 0, #0370ea 100%);
          border: 1px solid #076bd2;
          border-radius: 3px;
@@ -80,6 +83,7 @@
       .right {
          float: right;
       }
+      
       .sidebyside {
          display: inline-block;
          width: 45%;
@@ -87,6 +91,7 @@
          text-align: left;
          vertical-align: top;
       }
+      #micro
       #headline {
          font-size: 30px;
          font-weight: 300;
@@ -102,13 +107,16 @@
          font-weight: bold;
          border: 1px solid #ddd;
          padding: 15px;
-         text-align: left;
+         text-align: left;  
          min-height: 150px;
+         height:150px;
       }
       #start_button {
          border: 0;
          background-color: transparent;
          padding: 0;
+
+      
       }
    </style>
 
@@ -117,11 +125,18 @@
       <h5>Your View</h5>
       <div id="video-grid"></div>
       <div class="Chat">
-         <h5 id="headline" style="text-align: center">
+         <!-- <h5 id="headline" style="text-align: center">
             Transcript of video calling
-         </h5>
-         <div id="info">
-            <p id="info_start">Click on the microphone icon</p>
+         </h5> -->
+         <div class="button-area">
+            <button id="end-button">End Call</button>
+            <button id="invite-button">Invite Friends</button>
+         </div>
+      </div>
+  
+      <div class="mic-div" >
+         <div id="info" style="margin-top: 150px;">
+            <p id="info_start" style="font-size: 17px;">Click on the microphone icon</p>
 
             <p id="info_speak_now">Please Speak.</p>
 
@@ -162,7 +177,7 @@
             </p>
          </div>
          <div class="right">
-            <button id="start_button" onclick="startButton(event)">
+            <button id="start_button" style="font-size: larger;" onclick="startButton(event)">
                <img
                   id="start_img"
                   style="margin-right: 23vh"
@@ -171,43 +186,53 @@
                />
             </button>
          </div>
-         <div id="results" style="width: 50%; margin: auto">
-            <span id="final_span" class="final"></span>
-            <span id="interim_span" class="interim"></span>
+         <div id="results" style="width: 50%; margin: 20px auto">
+            <span id="final_span" class="final" style="font-size: 22px;"></span>
+            <span id="interim_span" class="interim" style="font-size: 22px;"></span>
          </div>
          <div class="center">
-            <p></p>
+            <p ></p>
             <div id="div_language">
-               <select id="select_language" onchange="updateCountry()"></select>
+               <select id="select_language" style="font-size: 22px;"  onchange="updateCountry()"></select>
                &nbsp;&nbsp;
-               <select id="select_dialect"></select>
+               <select id="select_dialect" style="font-size: 22px;"></select>
             </div>
          </div>
-
+         <!-- All translated data will be here  -->
          <div class="userT">
-            <span class="transfer"></span>
+            <span class="transfer" style="font-size: 22px;"></span>
 
             <span class="pretransfer"></span>
          </div>
-         <p id="user"></p>
-      </div>
-      <div class="button-area">
-         <button id="end-button">End Call</button>
-         <button id="invite-button">Invite Friends</button>
+         <br>
+         <p id="user" style="font-size: 22px;font-style: italic;font-weight: 100;"></p>
       </div>
    </section>
-
-   <!-- <script>
-      // const socket1 = io("http://localhost:3000");
-      const nme = prompt("enter your nme");
-      console.log("please give your nme");
-      // socket.emit("new", nme);
-   </script> -->
-   <script src="http://localhost:3000/socket.io/socket.io.js"></script>
-   <!-- <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script> -->
-   <script src="client.js"></script>
-
+      
+   
    <script>
+      const socket1 = io("http://localhost:3000");
+      // document.addEventListener("DOMContentLoaded", () => {
+         const nme = prompt("enter your name");
+         let bar = document.getElementsByClassName("transfer");
+         let spacebar = document.getElementsByClassName("pretransfer");
+         let user = document.getElementById("user");
+
+         //1
+         socket1.emit("new", nme);
+         //2
+         socket1.on("lets-start", na => {
+            console.log("newly connected user is ", na);
+         });
+         //3
+         socket1.on(`client-receive`, tata => {
+            console.log(`data id being received`);
+            bar[0].innerHTML = tata.F;
+            // spacebar[0].innerHTML = tata.I;
+            user.innerHTML = tata.user;
+         }); 
+      // });  
+        
       var langs = [
          [
             "English",
@@ -221,8 +246,7 @@
          //  ['मराठी',             ['mr-IN']],
          ["हिन्दी", ["hi-IN"]],
       ];
-      //  ['Magyar',          ['hu-HU']],
-      //  ['ລາວ',              ['lo-LA']]
+     
       for (var i = 0; i < langs.length; i++) {
          select_language.options[i] = new Option(langs[i][0], i);
       }
@@ -391,7 +415,7 @@
             console.log("is ended and sending data to server to");
             let langgs = document.getElementById("select_language").value;
             console.log(langs[langgs][0]);
-            socket.emit("send-to-server", {
+            socket1.emit("send-to-server", {
                FT: final_transcript,
                language: langs[langgs][0],
             });
@@ -443,8 +467,6 @@
          // email_info.style.display = 'none';
       }
 
-      // -----------------------------------------------------------------------------
-
-      
+      // -----------------------------------------------------------------------------      
    </script>
 </html>

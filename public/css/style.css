@@ -78,7 +78,9 @@ video {
 #block-display {
   display: none;
 }
-
+.mic-div{
+  font-size: 25px;
+}
 .button-area {
   display: flex;
   align-items: center;
